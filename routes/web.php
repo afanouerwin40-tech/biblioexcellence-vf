@@ -17,28 +17,28 @@ Route::middleware('guest')->group(function () {
 Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
 
 // Dashboard Admin
-Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'check.status'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', function () {
         return view('admin.dashboard');
     })->name('dashboard');
 });
 
 // Dashboard Bibliothécaire
-Route::middleware(['auth'])->prefix('librarian')->name('librarian.')->group(function () {
+Route::middleware(['auth', 'check.status'])->prefix('librarian')->name('librarian.')->group(function () {
     Route::get('/dashboard', function () {
         return view('librarian.dashboard');
     })->name('dashboard');
 });
 
 // Dashboard Enseignant
-Route::middleware(['auth'])->prefix('teacher')->name('teacher.')->group(function () {
+Route::middleware(['auth', 'check.status'])->prefix('teacher')->name('teacher.')->group(function () {
     Route::get('/dashboard', function () {
         return view('teacher.dashboard');
     })->name('dashboard');
 });
 
 // Dashboard Étudiant
-Route::middleware(['auth'])->prefix('student')->name('student.')->group(function () {
+Route::middleware(['auth', 'check.status'])->prefix('student')->name('student.')->group(function () {
     Route::get('/dashboard', function () {
         return view('student.dashboard');
     })->name('dashboard');
