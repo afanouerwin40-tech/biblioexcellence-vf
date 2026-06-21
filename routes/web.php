@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterStudentController;
 use App\Http\Controllers\Admin\UserValidationController;
+use App\Http\Controllers\Auth\RegisterTeacherController;
 
 // Page d'accueil → redirige vers login
 Route::get('/', function () {
@@ -19,6 +20,11 @@ Route::middleware('guest')->group(function () {
     Route::get('/register/student', [RegisterStudentController::class, 'create'])
          ->name('register.student');
     Route::post('/register/student', [RegisterStudentController::class, 'store']);
+
+    // Inscription enseignant
+    Route::get('/register/teacher', [RegisterTeacherController::class, 'create'])
+     ->name('register.teacher');
+    Route::post('/register/teacher', [RegisterTeacherController::class, 'store']);
 });
 
 Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
