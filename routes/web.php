@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\RegisterStudentController;
 
 // Page d'accueil → redirige vers login
 Route::get('/', function () {
@@ -12,6 +13,11 @@ Route::get('/', function () {
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'create'])->name('login');
     Route::post('/login', [LoginController::class, 'store']);
+
+    // Inscription étudiant
+    Route::get('/register/student', [RegisterStudentController::class, 'create'])
+         ->name('register.student');
+    Route::post('/register/student', [RegisterStudentController::class, 'store']);
 });
 
 Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
