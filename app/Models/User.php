@@ -36,4 +36,15 @@ class User extends Authenticatable
             'two_factor_enabled' => 'boolean',
         ];
     }
+
+    // Relations
+    public function students()
+    {
+        return $this->hasMany(Student::class);
+    }
+
+    public function teachers()
+    {
+        return $this->hasMany(Teacher::class);
+    }
 }
