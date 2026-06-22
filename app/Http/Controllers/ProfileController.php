@@ -2,59 +2,59 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ProfileUpdateRequest;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Redirect;
-use Illuminate\View\View;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Laravel\Facades\Image;
 
 class ProfileController extends Controller
 {
-    /**
-     * Display the user's profile form.
-     */
-    public function edit(Request $request): View
+    public function edit()
     {
-        return view('profile.edit', [
-            'user' => $request->user(),
-        ]);
+        $user = auth()->user();
+        return view('profile.edit', compact('user'));
     }
 
-    /**
-     * Update the user's profile information.
-     */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function update(Request $request)
     {
-        $request->user()->fill($request->validated());
+        $user = auth()->user();
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        $request->validate([
+            'name'                  => ['required', 'string', 'max:150'],
+            'email'                 => ['required', 'email', 'unique:users,email,' . $user->id],
+            'photo'                 => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
+            'current_password'      => ['nullable', 'string'],
+            'password'              => ['nullable', 'string', 'min:8', 'confirmed'],
+        ], [
+            'name.required'    => 'Le nom est obligatoire.',
+            'email.required'   => 'L\'email est obligatoire.',
+            'email.unique'     => 'Cet email est déjà utilisé.',
+            'password.min'     => 'Le mot de passe doit contenir au moins 8 caractères.',
+            'password.confirmed' => 'Les mots de passe ne correspondent pas.',
+        ]);
+
+        // Mise à jour photo
+        if ($request->hasFile('photo')) {
+            $filename = 'photos/profiles/' . uniqid() . '.jpg';
+            $image = Image::read($request->file('photo'))
+                ->cover(400, 400)
+                ->toJpeg(80);
+            Storage::disk('public')->put($filename, $image);
+            $user->profile_photo = $filename;
         }
 
-        $request->user()->save();
+        // Mise à jour mot de passe
+        if ($request->filled('password')) {
+            if (!Hash::check($request->current_password, $user->password)) {
+                return back()->withErrors(['current_password' => 'Mot de passe actuel incorrect.']);
+            }
+            $user->password = Hash::make($request->password);
+        }
 
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
-    }
+        $user->name  = $request->name;
+        $user->email = $request->email;
+        $user->save();
 
-    /**
-     * Delete the user's account.
-     */
-    public function destroy(Request $request): RedirectResponse
-    {
-        $request->validateWithBag('userDeletion', [
-            'password' => ['required', 'current_password'],
-        ]);
-
-        $user = $request->user();
-
-        Auth::logout();
-
-        $user->delete();
-
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return Redirect::to('/');
+        return back()->with('success', 'Profil mis à jour avec succès.');
     }
 }
