@@ -59,6 +59,16 @@
 
         </div>
     </div>
+    {{-- Footer --}}
+        <footer class="px-6 py-4 border-t border-gray-100 bg-white">
+            <p class="text-xs text-gray-400 text-center">
+                © {{ date('Y') }} BiblioExcellence
+            </p>
+        </footer>
 
+    </div>
+</div>
+
+@stack('scripts')
 </body>
 </html>
