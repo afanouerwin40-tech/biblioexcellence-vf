@@ -11,8 +11,7 @@ class ProfileController extends Controller
 {
     public function edit()
     {
-        $user = auth()->user();
-        return view('profile.edit', compact('user'));
+        return view('profile.edit', ['user' => auth()->user()]);
     }
 
     public function update(Request $request)
@@ -20,20 +19,19 @@ class ProfileController extends Controller
         $user = auth()->user();
 
         $request->validate([
-            'name'                  => ['required', 'string', 'max:150'],
-            'email'                 => ['required', 'email', 'unique:users,email,' . $user->id],
-            'photo'                 => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
-            'current_password'      => ['nullable', 'string'],
-            'password'              => ['nullable', 'string', 'min:8', 'confirmed'],
+            'name'             => ['required', 'string', 'max:150'],
+            'email'            => ['required', 'email', 'unique:users,email,' . $user->id],
+            'photo'            => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
+            'current_password' => ['nullable', 'string'],
+            'password'         => ['nullable', 'string', 'min:8', 'confirmed'],
         ], [
-            'name.required'    => 'Le nom est obligatoire.',
-            'email.required'   => 'L\'email est obligatoire.',
-            'email.unique'     => 'Cet email est déjà utilisé.',
-            'password.min'     => 'Le mot de passe doit contenir au moins 8 caractères.',
+            'name.required'      => 'Le nom est obligatoire.',
+            'email.required'     => 'L\'email est obligatoire.',
+            'email.unique'       => 'Cet email est déjà utilisé.',
+            'password.min'       => 'Minimum 8 caractères.',
             'password.confirmed' => 'Les mots de passe ne correspondent pas.',
         ]);
 
-        // Mise à jour photo
         if ($request->hasFile('photo')) {
             $filename = 'photos/profiles/' . uniqid() . '.jpg';
             $image = Image::read($request->file('photo'))
@@ -43,7 +41,6 @@ class ProfileController extends Controller
             $user->profile_photo = $filename;
         }
 
-        // Mise à jour mot de passe
         if ($request->filled('password')) {
             if (!Hash::check($request->current_password, $user->password)) {
                 return back()->withErrors(['current_password' => 'Mot de passe actuel incorrect.']);
@@ -56,5 +53,10 @@ class ProfileController extends Controller
         $user->save();
 
         return back()->with('success', 'Profil mis à jour avec succès.');
+    }
+
+    public function destroy(Request $request)
+    {
+        return redirect('/login');
     }
 }

@@ -4,14 +4,17 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterStudentController;
 use App\Http\Controllers\Auth\RegisterTeacherController;
-use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
 use App\Http\Controllers\Admin\UserValidationController;
 use App\Http\Controllers\Admin\BookController;
 use App\Http\Controllers\Admin\AuthorController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\LibrarianController;
+use App\Http\Controllers\Student\DashboardController as StudentDashboard;
+use App\Http\Controllers\Teacher\DashboardController as TeacherDashboard;
+use App\Http\Controllers\Librarian\DashboardController as LibrarianDashboard;
 use App\Http\Controllers\ProfileController;
 
-// Page d'accueil
 Route::get('/', fn() => redirect('/login'));
 
 // Authentification
@@ -32,7 +35,7 @@ Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
 
 // Admin
 Route::middleware(['auth', 'check.status'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', [AdminDashboard::class, 'index'])->name('dashboard');
     Route::get('/validations', [UserValidationController::class, 'index'])->name('validations.index');
     Route::get('/validations/{user}', [UserValidationController::class, 'show'])->name('validations.show');
     Route::post('/validations/{user}/approve', [UserValidationController::class, 'approve'])->name('validations.approve');
@@ -45,34 +48,28 @@ Route::middleware(['auth', 'check.status'])->prefix('admin')->name('admin.')->gr
     Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
     Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
     Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-
+    Route::get('/librarians', [LibrarianController::class, 'index'])->name('librarians.index');
+    Route::get('/librarians/create', [LibrarianController::class, 'create'])->name('librarians.create');
+    Route::post('/librarians', [LibrarianController::class, 'store'])->name('librarians.store');
+    Route::delete('/librarians/{librarian}', [LibrarianController::class, 'destroy'])->name('librarians.destroy');
 });
 
 // Bibliothécaire
 Route::middleware(['auth', 'check.status'])->prefix('librarian')->name('librarian.')->group(function () {
-    Route::get('/dashboard', fn() => view('librarian.dashboard'))->name('dashboard');
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-
+    Route::get('/dashboard', [LibrarianDashboard::class, 'index'])->name('dashboard');
 });
 
 // Enseignant
 Route::middleware(['auth', 'check.status'])->prefix('teacher')->name('teacher.')->group(function () {
-    Route::get('/dashboard', fn() => view('teacher.dashboard'))->name('dashboard');
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::get('/dashboard', [TeacherDashboard::class, 'index'])->name('dashboard');
 });
 
 // Étudiant
 Route::middleware(['auth', 'check.status'])->prefix('student')->name('student.')->group(function () {
-    Route::get('/dashboard', fn() => view('student.dashboard'))->name('dashboard');
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::get('/dashboard', [StudentDashboard::class, 'index'])->name('dashboard');
 });
 
-// Profil — accessible à tous les rôles
+// Profil
 Route::middleware(['auth', 'check.status'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
