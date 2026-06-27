@@ -7,11 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class BookCopy extends Model
 {
     protected $fillable = [
-        'book_id',
-        'code_exemplaire',
-        'etat',
-        'disponible',
-        'notes',
+        'book_id', 'code_exemplaire', 'etat', 'disponible', 'notes',
     ];
 
     protected $casts = [

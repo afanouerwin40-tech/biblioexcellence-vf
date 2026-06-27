@@ -23,13 +23,21 @@ class DashboardController extends Controller
                                             ->where('statut', 'en_attente')->count(),
         ];
 
+        // Emprunts actifs
         $emprunts = Loan::with('bookCopy.book')
             ->where('user_id', $user->id)
-            ->where('statut', 'actif')
+            ->whereIn('statut', ['actif', 'en_retard', 'renouvele'])
             ->latest()
-            ->limit(5)
             ->get();
 
-        return view('student.dashboard', compact('stats', 'emprunts'));
+        // Historique
+        $historique = Loan::with('bookCopy.book')
+            ->where('user_id', $user->id)
+            ->whereIn('statut', ['retourne', 'perdu'])
+            ->latest()
+            ->limit(10)
+            ->get();
+
+        return view('student.dashboard', compact('stats', 'emprunts', 'historique'));
     }
 }
