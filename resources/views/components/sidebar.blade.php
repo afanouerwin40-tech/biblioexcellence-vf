@@ -109,6 +109,26 @@
                 <span x-show="sidebarOpen" class="whitespace-nowrap">Tableau de bord</span>
             </a>
 
+            <a href="{{ route('librarian.loans.index') }}"
+   class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition
+          {{ request()->routeIs('librarian.loans*') ? 'bg-blue-700 text-white' : 'text-blue-200 hover:bg-blue-800 hover:text-white' }}">
+    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+    </svg>
+    <span x-show="sidebarOpen" class="whitespace-nowrap">Emprunts</span>
+</a>
+
+<a href="{{ route('librarian.returns.create') }}"
+   class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition
+          {{ request()->routeIs('librarian.returns*') ? 'bg-blue-700 text-white' : 'text-blue-200 hover:bg-blue-800 hover:text-white' }}">
+    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+    </svg>
+    <span x-show="sidebarOpen" class="whitespace-nowrap">Retours</span>
+</a>
+
         @elseif($role === 'teacher')
 
             <a href="{{ route('teacher.dashboard') }}"

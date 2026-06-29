@@ -14,6 +14,8 @@ use App\Http\Controllers\Student\DashboardController as StudentDashboard;
 use App\Http\Controllers\Teacher\DashboardController as TeacherDashboard;
 use App\Http\Controllers\Librarian\DashboardController as LibrarianDashboard;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Librarian\LoanController;
+use App\Http\Controllers\Librarian\ReturnController;
 
 Route::get('/', fn() => redirect('/login'));
 
@@ -57,6 +59,9 @@ Route::middleware(['auth', 'check.status'])->prefix('admin')->name('admin.')->gr
 // Bibliothécaire
 Route::middleware(['auth', 'check.status'])->prefix('librarian')->name('librarian.')->group(function () {
     Route::get('/dashboard', [LibrarianDashboard::class, 'index'])->name('dashboard');
+    Route::resource('loans', LoanController::class);
+    Route::resource('returns', ReturnController::class);
+    Route::post('/loans/{loan}/renew', [ReturnController::class, 'renew'])->name('loans.renew');
 });
 
 // Enseignant
