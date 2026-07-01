@@ -152,15 +152,15 @@
                         </p>
                         @if($isLate)
                             <span class="text-xs bg-red-50 text-red-600 px-2 py-0.5 rounded-lg mt-1 inline-block">
-                                {{ abs($daysLeft) }}j de retard
+                                {{ round(abs($daysLeft)) }}j de retard
                             </span>
                         @elseif($isUrgent)
                             <span class="text-xs bg-amber-50 text-amber-600 px-2 py-0.5 rounded-lg mt-1 inline-block">
-                                {{ $daysLeft }}j restant(s)
+                                {{ round($daysLeft) }}j restant(s)
                             </span>
                         @else
                             <span class="text-xs bg-green-50 text-green-600 px-2 py-0.5 rounded-lg mt-1 inline-block">
-                                {{ $daysLeft }}j restant(s)
+                                {{ round($daysLeft) }}j restant(s)
                             </span>
                         @endif
                     </div>
