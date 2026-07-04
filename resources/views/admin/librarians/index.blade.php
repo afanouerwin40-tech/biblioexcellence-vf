@@ -34,6 +34,7 @@
                     <th class="px-6 py-3 text-left">Email</th>
                     <th class="px-6 py-3 text-left">Matricule</th>
                     <th class="px-6 py-3 text-left">Téléphone</th>
+                    <th class="px-6 py-3 text-left">Statut</th>
                     <th class="px-6 py-3 text-left">Actions</th>
                 </tr>
             </thead>
@@ -47,19 +48,20 @@
                                         {{ strtoupper(substr($librarian->prenom, 0, 1)) }}
                                     </span>
                                 </div>
-                                <p class="text-sm font-medium text-gray-700">
-                                    {{ $librarian->prenom }} {{ $librarian->nom }}
-                                </p>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-700">
+                                        {{ $librarian->prenom }} {{ $librarian->nom }}
+                                    </p>
+                                </div>
                             </div>
                         </td>
-                        <td class="px-6 py-4 text-sm text-gray-600">
-                            {{ $librarian->user->email ?? '—' }}
-                        </td>
-                        <td class="px-6 py-4 text-sm font-mono text-gray-600">
-                            {{ $librarian->matricule_pro }}
-                        </td>
-                        <td class="px-6 py-4 text-sm text-gray-600">
-                            {{ $librarian->telephone ?? '—' }}
+                        <td class="px-6 py-4 text-sm text-gray-600">{{ $librarian->user->email }}</td>
+                        <td class="px-6 py-4 text-sm font-mono text-gray-600">{{ $librarian->matricule_pro }}</td>
+                        <td class="px-6 py-4 text-sm text-gray-600">{{ $librarian->telephone ?? '—' }}</td>
+                        <td class="px-6 py-4">
+                            <span class="px-2.5 py-1 bg-green-50 text-green-600 rounded-lg text-xs font-medium">
+                                Actif
+                            </span>
                         </td>
                         <td class="px-6 py-4">
                             <form method="POST"
@@ -78,9 +80,7 @@
         </table>
 
         @if($librarians->hasPages())
-            <div class="px-6 py-4 border-t border-gray-100">
-                {{ $librarians->links() }}
-            </div>
+            <div class="px-6 py-4 border-t border-gray-100">{{ $librarians->links() }}</div>
         @endif
     @endif
 </div>

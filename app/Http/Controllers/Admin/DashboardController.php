@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Book;
 use App\Models\Category;
+use App\Models\Loan;
 use App\Models\Student;
 use App\Models\Teacher;
 use App\Models\User;
@@ -14,6 +15,7 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        // Statistiques principales
         $stats = [
             'total_books'      => Book::count(),
             'total_students'   => Student::count(),
@@ -23,11 +25,7 @@ class DashboardController extends Controller
             'borrowed_books'   => Book::where('quantite_disponible', 0)->count(),
         ];
 
-        // Inscriptions 6 derniers mois
-        $months = ['Jan','Fév','Mar','Avr','Mai','Jui','Jul','Aoû','Sep','Oct','Nov','Déc'];
-        $registrationLabels = [];
-        $registrationData   = [];
-
+        // Inscriptions des 6 derniers mois
         $registrations = User::select(
                 DB::raw('MONTH(created_at) as month'),
                 DB::raw('YEAR(created_at) as year'),
@@ -35,7 +33,13 @@ class DashboardController extends Controller
             )
             ->where('created_at', '>=', now()->subMonths(6))
             ->groupBy('year', 'month')
+            ->orderBy('year')
+            ->orderBy('month')
             ->get();
+
+        $registrationLabels = [];
+        $registrationData   = [];
+        $months = ['Jan','Fév','Mar','Avr','Mai','Jui','Jul','Aoû','Sep','Oct','Nov','Déc'];
 
         for ($i = 5; $i >= 0; $i--) {
             $date  = now()->subMonths($i);
@@ -53,7 +57,7 @@ class DashboardController extends Controller
             ->limit(6)
             ->get();
 
-        // Statuts des comptes
+        // Comptes par statut
         $accountStats = [
             'approved'  => User::where('status', 'approved')->count(),
             'pending'   => User::where('status', 'pending')->count(),
@@ -61,9 +65,11 @@ class DashboardController extends Controller
             'suspended' => User::where('status', 'suspended')->count(),
         ];
 
-        // Derniers comptes en attente
+        // Dernières inscriptions
         $recentUsers = User::where('status', 'pending')
-            ->latest()->limit(5)->get();
+            ->latest()
+            ->limit(5)
+            ->get();
 
         return view('admin.dashboard', compact(
             'stats',

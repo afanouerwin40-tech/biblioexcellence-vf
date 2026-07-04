@@ -34,7 +34,7 @@
                            class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm
                                   focus:outline-none focus:ring-2 focus:ring-blue-500
                                   @error('nom') border-red-400 @enderror">
-                    @error('nom')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                    @error('nom') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
 
                 <div>
@@ -45,7 +45,7 @@
                            class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm
                                   focus:outline-none focus:ring-2 focus:ring-blue-500
                                   @error('prenom') border-red-400 @enderror">
-                    @error('prenom')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                    @error('prenom') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
 
                 <div>
@@ -57,7 +57,7 @@
                            class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm
                                   focus:outline-none focus:ring-2 focus:ring-blue-500
                                   @error('matricule_pro') border-red-400 @enderror">
-                    @error('matricule_pro')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                    @error('matricule_pro') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
 
                 <div>
@@ -90,7 +90,7 @@
                            class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm
                                   focus:outline-none focus:ring-2 focus:ring-blue-500
                                   @error('email') border-red-400 @enderror">
-                    @error('email')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                    @error('email') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
 
                 <div>
@@ -101,7 +101,7 @@
                            class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm
                                   focus:outline-none focus:ring-2 focus:ring-blue-500
                                   @error('password') border-red-400 @enderror">
-                    @error('password')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                    @error('password') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
 
                 <div>
@@ -114,8 +114,9 @@
                 </div>
 
                 <div class="bg-blue-50 rounded-xl p-4 text-sm text-blue-700">
-                    Le compte sera créé directement avec le statut <strong>Approuvé</strong>.
-                    Le bibliothécaire peut se connecter immédiatement avec son matricule.
+                    <p class="font-medium mb-1">Information</p>
+                    <p>Le compte sera créé directement avec le statut <strong>Approuvé</strong>.
+                       Le bibliothécaire peut se connecter immédiatement avec son matricule et son mot de passe.</p>
                 </div>
 
             </div>

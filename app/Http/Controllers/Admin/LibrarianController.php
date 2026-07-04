@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreLibrarianRequest;
 use App\Models\Librarian;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
@@ -22,28 +22,8 @@ class LibrarianController extends Controller
         return view('admin.librarians.create');
     }
 
-    public function store(Request $request)
+    public function store(StoreLibrarianRequest $request)
     {
-        $request->validate([
-            'nom'           => ['required', 'string', 'max:100'],
-            'prenom'        => ['required', 'string', 'max:100'],
-            'email'         => ['required', 'email', 'unique:users,email'],
-            'matricule_pro' => ['required', 'string', 'max:50', 'unique:librarians,matricule_pro'],
-            'telephone'     => ['nullable', 'string', 'max:20'],
-            'adresse'       => ['nullable', 'string', 'max:255'],
-            'password'      => ['required', 'string', 'min:8', 'confirmed'],
-        ], [
-            'nom.required'           => 'Le nom est obligatoire.',
-            'prenom.required'        => 'Le prénom est obligatoire.',
-            'email.required'         => 'L\'email est obligatoire.',
-            'email.unique'           => 'Cet email est déjà utilisé.',
-            'matricule_pro.required' => 'Le matricule est obligatoire.',
-            'matricule_pro.unique'   => 'Ce matricule est déjà enregistré.',
-            'password.required'      => 'Le mot de passe est obligatoire.',
-            'password.min'           => 'Minimum 8 caractères.',
-            'password.confirmed'     => 'Les mots de passe ne correspondent pas.',
-        ]);
-
         DB::transaction(function () use ($request) {
             $user = User::create([
                 'name'       => $request->prenom . ' ' . $request->nom,

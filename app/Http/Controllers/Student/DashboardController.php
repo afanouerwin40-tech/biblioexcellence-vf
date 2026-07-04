@@ -14,30 +14,22 @@ class DashboardController extends Controller
         $user = auth()->user();
 
         $stats = [
-            'emprunts_actifs' => Loan::where('user_id', $user->id)
-                         ->whereIn('statut', ['actif', 'en_retard', 'renouvele'])->count(),
-            'emprunts_total'  => Loan::where('user_id', $user->id)->count(),
-            'penalites'       => Penalty::where('user_id', $user->id)
-                                        ->where('statut', 'impayee')->sum('montant'),
-            'reservations'    => Reservation::where('user_id', $user->id)
-                                            ->where('statut', 'en_attente')->count(),
+            'emprunts_actifs'  => Loan::where('user_id', $user->id)
+                                      ->where('statut', 'actif')->count(),
+            'emprunts_total'   => Loan::where('user_id', $user->id)->count(),
+            'penalites'        => Penalty::where('user_id', $user->id)
+                                         ->where('statut', 'impayee')->sum('montant'),
+            'reservations'     => Reservation::where('user_id', $user->id)
+                                             ->where('statut', 'en_attente')->count(),
         ];
 
-        // Emprunts actifs
         $emprunts = Loan::with('bookCopy.book')
             ->where('user_id', $user->id)
-            ->whereIn('statut', ['actif', 'en_retard', 'renouvele'])
+            ->where('statut', 'actif')
             ->latest()
+            ->limit(5)
             ->get();
 
-        // Historique
-        $historique = Loan::with('bookCopy.book')
-            ->where('user_id', $user->id)
-            ->whereIn('statut', ['retourne', 'perdu'])
-            ->latest()
-            ->limit(10)
-            ->get();
-
-        return view('student.dashboard', compact('stats', 'emprunts', 'historique'));
+        return view('student.dashboard', compact('stats', 'emprunts'));
     }
 }
