@@ -27,6 +27,27 @@ class RegisterStudentController extends Controller
     }
 
     /**
+     * Génère un matricule unique pour un étudiant
+     * Format : ETU + numéro incrémenté (ex: ETU0001)
+     */
+    private function generateMatricule(): string
+    {
+        $prefix = 'ETU';
+        $last = Student::where('matricule', 'like', $prefix . '%')
+            ->orderBy('matricule', 'desc')
+            ->first();
+
+        if ($last) {
+            $lastNumber = (int) substr($last->matricule, strlen($prefix));
+            $newNumber = $lastNumber + 1;
+        } else {
+            $newNumber = 1;
+        }
+
+        return $prefix . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
+    }
+
+    /**
      * Traite l'inscription de l'étudiant.
      */
     public function store(RegisterStudentRequest $request)
@@ -34,34 +55,37 @@ class RegisterStudentController extends Controller
         // Transaction — si une étape échoue, tout est annulé
         DB::transaction(function () use ($request) {
 
-            // 1. Traitement de la photo de profil
+            // 1. Génération automatique du matricule
+            $matricule = $this->generateMatricule();
+
+            // 2. Traitement de la photo de profil
             $photoPath = null;
             if ($request->hasFile('photo')) {
                 $photoPath = $this->processPhoto($request->file('photo'));
             }
 
-            // 2. Stockage de la carte étudiante
+            // 3. Stockage de la carte étudiante
             $cartePath = $request->file('carte_etudiante')
                 ->store('cartes/etudiants', 'public');
 
-            // 3. Création du compte utilisateur
+            // 4. Création du compte utilisateur
             $user = User::create([
                 'name'       => $request->prenom . ' ' . $request->nom,
                 'email'      => $request->email,
-                'identifier' => $request->matricule,
+                'identifier' => $matricule,              // Matricule généré
                 'password'   => Hash::make($request->password),
                 'status'     => 'pending',
                 'role_type'  => 'student',
             ]);
 
-            // 4. Attribution du rôle Spatie
+            // 5. Attribution du rôle Spatie
             $user->assignRole('student');
 
-            // 5. Création du profil étudiant
+            // 6. Création du profil étudiant
             Student::create([
                 'user_id'          => $user->id,
                 'department_id'    => $request->department_id,
-                'matricule'        => $request->matricule,
+                'matricule'        => $matricule,        // Matricule généré
                 'nom'              => $request->nom,
                 'prenom'           => $request->prenom,
                 'sexe'             => $request->sexe,

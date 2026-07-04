@@ -63,8 +63,6 @@ class RegisterStudentRequest extends FormRequest
             'email.required'            => 'L\'email est obligatoire.',
             'email.email'               => 'L\'email n\'est pas valide.',
             'email.unique'              => 'Cet email est déjà utilisé.',
-            'matricule.required'        => 'Le matricule est obligatoire.',
-            'matricule.unique'          => 'Ce matricule est déjà enregistré.',
             'department_id.required'    => 'Le département est obligatoire.',
             'department_id.exists'      => 'Le département sélectionné est invalide.',
             'niveau.required'           => 'Le niveau est obligatoire.',

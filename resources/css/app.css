@@ -1,3 +1,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Pour le swipe */
+.group {
+    touch-action: pan-y; /* empêche le scroll vertical pendant le swipe */
+}

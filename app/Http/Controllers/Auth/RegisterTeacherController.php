@@ -23,38 +23,62 @@ class RegisterTeacherController extends Controller
         return view('auth.register-teacher', compact('faculties', 'departments'));
     }
 
+    /**
+     * Génère un matricule unique pour un professeur
+     * Format : PRO + numéro incrémenté (ex: PRO0001)
+     */
+    private function generateMatricule(): string
+    {
+        $prefix = 'PRO';
+        $last = Teacher::where('matricule_pro', 'like', $prefix . '%')
+            ->orderBy('matricule_pro', 'desc')
+            ->first();
+
+        if ($last) {
+            $lastNumber = (int) substr($last->matricule_pro, strlen($prefix));
+            $newNumber = $lastNumber + 1;
+        } else {
+            $newNumber = 1;
+        }
+
+        return $prefix . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
+    }
+
     public function store(RegisterTeacherRequest $request)
     {
         DB::transaction(function () use ($request) {
 
-            // 1. Traitement photo
+            // 1. Génération automatique du matricule
+            $matricule = $this->generateMatricule();
+
+            // 2. Traitement photo
             $photoPath = null;
             if ($request->hasFile('photo')) {
                 $photoPath = $this->processPhoto($request->file('photo'));
             }
 
-            // 2. Stockage carte professionnelle
+            // 3. Stockage carte professionnelle
             $cartePath = $request->file('carte_professionnelle')
                 ->store('cartes/enseignants', 'public');
 
-            // 3. Création compte utilisateur
+            // 4. Création compte utilisateur
             $user = User::create([
                 'name'       => $request->prenom . ' ' . $request->nom,
                 'email'      => $request->email,
-                'identifier' => $request->matricule_pro,
+                'identifier' => $matricule,              // Matricule généré
                 'password'   => Hash::make($request->password),
                 'status'     => 'pending',
                 'role_type'  => 'teacher',
             ]);
 
-            // 4. Attribution du rôle
+            // 5. Attribution du rôle
             $user->assignRole('teacher');
 
-            // 5. Création profil enseignant
+            // 6. Création profil enseignant
             Teacher::create([
                 'user_id'               => $user->id,
                 'department_id'         => $request->department_id,
-                'matricule_pro'         => $request->matricule_pro,
+                'matricule_pro'         => $matricule,    // Matricule généré
                 'nom'                   => $request->nom,
                 'prenom'                => $request->prenom,
                 'grade'                 => $request->grade,

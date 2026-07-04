@@ -15,27 +15,30 @@ class PenaltyController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Penalty::with(['user', 'loan.bookCopy.book'])
-            ->latest();
+        $query = Penalty::with('user', 'loan.bookCopy.book');
 
+        if ($request->filled('date')) {
+            $query->whereDate('created_at', $request->date);
+        }
+        if ($request->filled('month')) {
+            $month = explode('-', $request->month);
+            $query->whereMonth('created_at', $month[1])
+                ->whereYear('created_at', $month[0]);
+        }
+        if ($request->filled('year')) {
+            $query->whereYear('created_at', $request->year);
+        }
         if ($request->filled('statut')) {
             $query->where('statut', $request->statut);
         }
 
-        if ($request->filled('search')) {
-            $query->whereHas('user', function ($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->search . '%')
-                  ->orWhere('identifier', 'like', '%' . $request->search . '%');
-            });
-        }
-
-        $penalties = $query->paginate(20);
+        $penalties = $query->latest()->paginate(15);
 
         $stats = [
-            'total_impayees'  => Penalty::where('statut', 'impayee')->sum('montant'),
-            'total_payees'    => Penalty::where('statut', 'payee')->sum('montant'),
-            'nb_impayees'     => Penalty::where('statut', 'impayee')->count(),
-            'nb_payees'       => Penalty::where('statut', 'payee')->count(),
+            'total_impayees' => Penalty::where('statut', 'impayee')->sum('montant'),
+            'total_payees' => Penalty::where('statut', 'payee')->sum('montant'),
+            'nb_impayees' => Penalty::where('statut', 'impayee')->count(),
+            'nb_payees' => Penalty::where('statut', 'payee')->count(),
         ];
 
         return view('librarian.penalties.index', compact('penalties', 'stats'));

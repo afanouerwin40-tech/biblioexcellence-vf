@@ -6,7 +6,7 @@
 
 @section('content')
 
-{{-- Statistiques principales --}}
+{{-- Stats principales --}}
 <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
 
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
@@ -80,23 +80,15 @@
 {{-- Graphiques --}}
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
 
-    {{-- Graphique inscriptions --}}
     <div class="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-        <div class="flex items-center justify-between mb-6">
-            <div>
-                <h3 class="font-semibold text-gray-700">Inscriptions</h3>
-                <p class="text-xs text-gray-400 mt-0.5">6 derniers mois</p>
-            </div>
-        </div>
+        <h3 class="font-semibold text-gray-700 mb-1">Inscriptions</h3>
+        <p class="text-xs text-gray-400 mb-6">6 derniers mois</p>
         <canvas id="registrationsChart" height="120"></canvas>
     </div>
 
-    {{-- Graphique répartition comptes --}}
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-        <div class="mb-6">
-            <h3 class="font-semibold text-gray-700">Statuts des comptes</h3>
-            <p class="text-xs text-gray-400 mt-0.5">Répartition actuelle</p>
-        </div>
+        <h3 class="font-semibold text-gray-700 mb-1">Statuts des comptes</h3>
+        <p class="text-xs text-gray-400 mb-6">Répartition actuelle</p>
         <canvas id="accountsChart" height="180"></canvas>
         <div class="mt-4 space-y-2">
             <div class="flex items-center justify-between text-xs">
@@ -104,44 +96,42 @@
                     <div class="w-3 h-3 rounded-full bg-green-400"></div>
                     <span class="text-gray-600">Approuvés</span>
                 </div>
-                <span class="font-medium text-gray-700">{{ $accountStats['approved'] }}</span>
+                <span class="font-medium">{{ $accountStats['approved'] }}</span>
             </div>
             <div class="flex items-center justify-between text-xs">
                 <div class="flex items-center gap-2">
                     <div class="w-3 h-3 rounded-full bg-amber-400"></div>
                     <span class="text-gray-600">En attente</span>
                 </div>
-                <span class="font-medium text-gray-700">{{ $accountStats['pending'] }}</span>
+                <span class="font-medium">{{ $accountStats['pending'] }}</span>
             </div>
             <div class="flex items-center justify-between text-xs">
                 <div class="flex items-center gap-2">
                     <div class="w-3 h-3 rounded-full bg-red-400"></div>
                     <span class="text-gray-600">Rejetés</span>
                 </div>
-                <span class="font-medium text-gray-700">{{ $accountStats['rejected'] }}</span>
+                <span class="font-medium">{{ $accountStats['rejected'] }}</span>
             </div>
             <div class="flex items-center justify-between text-xs">
                 <div class="flex items-center gap-2">
                     <div class="w-3 h-3 rounded-full bg-gray-400"></div>
                     <span class="text-gray-600">Suspendus</span>
                 </div>
-                <span class="font-medium text-gray-700">{{ $accountStats['suspended'] }}</span>
+                <span class="font-medium">{{ $accountStats['suspended'] }}</span>
             </div>
         </div>
     </div>
 
 </div>
 
-{{-- Livres par catégorie + Comptes en attente --}}
+{{-- Catégories + Dernières inscriptions --}}
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-    {{-- Livres par catégorie --}}
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
         <h3 class="font-semibold text-gray-700 mb-6">Livres par catégorie</h3>
         <canvas id="categoriesChart" height="200"></canvas>
     </div>
 
-    {{-- Derniers comptes en attente --}}
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
             <h3 class="font-semibold text-gray-700">Dernières inscriptions</h3>
@@ -150,9 +140,7 @@
         </div>
 
         @if($recentUsers->isEmpty())
-            <div class="text-center py-12 text-gray-400 text-sm">
-                Aucun compte en attente
-            </div>
+            <div class="text-center py-12 text-gray-400 text-sm">Aucun compte en attente</div>
         @else
             <div class="divide-y divide-gray-50">
                 @foreach($recentUsers as $user)
@@ -170,13 +158,16 @@
                         </div>
                         <div class="flex items-center gap-2">
                             <span class="text-xs px-2.5 py-1 rounded-lg
-                                {{ $user->role_type === 'student' ? 'bg-blue-50 text-blue-600' : 'bg-purple-50 text-purple-600' }}">
+                                {{ $user->role_type === 'student'
+                                    ? 'bg-blue-50 text-blue-600'
+                                    : 'bg-purple-50 text-purple-600' }}">
                                 {{ $user->role_type === 'student' ? 'Étudiant' : 'Enseignant' }}
                             </span>
-                            <form method="POST" action="{{ route('admin.validations.approve', $user) }}">
+                            <form method="POST"
+                                  action="{{ route('admin.validations.approve', $user) }}">
                                 @csrf
                                 <button class="text-xs px-2.5 py-1 bg-green-50 text-green-600
-                                               rounded-lg hover:bg-green-100 transition font-medium">
+                                               rounded-lg hover:bg-green-100 font-medium">
                                     Approuver
                                 </button>
                             </form>
@@ -194,7 +185,6 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // Graphique inscriptions
     new Chart(document.getElementById('registrationsChart'), {
         type: 'line',
         data: {
@@ -203,7 +193,7 @@
                 label: 'Inscriptions',
                 data: @json($registrationData),
                 borderColor: '#2563eb',
-                backgroundColor: 'rgba(37, 99, 235, 0.08)',
+                backgroundColor: 'rgba(37,99,235,0.08)',
                 borderWidth: 2.5,
                 fill: true,
                 tension: 0.4,
@@ -215,21 +205,16 @@
             responsive: true,
             plugins: { legend: { display: false } },
             scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: { stepSize: 1 },
-                    grid: { color: 'rgba(0,0,0,0.04)' }
-                },
+                y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: 'rgba(0,0,0,0.04)' } },
                 x: { grid: { display: false } }
             }
         }
     });
 
-    // Graphique statuts comptes
     new Chart(document.getElementById('accountsChart'), {
         type: 'doughnut',
         data: {
-            labels: ['Approuvés', 'En attente', 'Rejetés', 'Suspendus'],
+            labels: ['Approuvés','En attente','Rejetés','Suspendus'],
             datasets: [{
                 data: [
                     {{ $accountStats['approved'] }},
@@ -237,7 +222,7 @@
                     {{ $accountStats['rejected'] }},
                     {{ $accountStats['suspended'] }}
                 ],
-                backgroundColor: ['#4ade80', '#fbbf24', '#f87171', '#9ca3af'],
+                backgroundColor: ['#4ade80','#fbbf24','#f87171','#9ca3af'],
                 borderWidth: 0,
             }]
         },
@@ -248,7 +233,6 @@
         }
     });
 
-    // Graphique livres par catégorie
     new Chart(document.getElementById('categoriesChart'), {
         type: 'bar',
         data: {
@@ -271,11 +255,7 @@
             responsive: true,
             plugins: { legend: { display: false } },
             scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: { stepSize: 1 },
-                    grid: { color: 'rgba(0,0,0,0.04)' }
-                },
+                y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: 'rgba(0,0,0,0.04)' } },
                 x: { grid: { display: false } }
             }
         }

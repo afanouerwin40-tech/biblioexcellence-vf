@@ -71,4 +71,37 @@ class ReturnController extends Controller
         return back()->with('success', 'Emprunt renouvelé. Nouveau retour prévu le ' .
             $loan->fresh()->date_retour_prevue->format('d/m/Y') . '.');
     }
+
+    public function index(Request $request)
+    {
+        $query = Loan::with('user', 'bookCopy.book')
+            ->whereIn('statut', ['retourne', 'perdu']);
+
+        // Filtres
+        if ($request->filled('date')) {
+            $query->whereDate('date_retour_effective', $request->date);
+        }
+        if ($request->filled('month')) {
+            $month = explode('-', $request->month);
+            $query->whereMonth('date_retour_effective', $month[1])
+                ->whereYear('date_retour_effective', $month[0]);
+        }
+        if ($request->filled('year')) {
+            $query->whereYear('date_retour_effective', $request->year);
+        }
+        if ($request->filled('statut')) {
+            $query->where('statut', $request->statut);
+        }
+
+        $returns = $query->latest('date_retour_effective')->paginate(15);
+
+        $stats = [
+            'total' => Loan::whereIn('statut', ['retourne', 'perdu'])->count(),
+            'du_jour' => Loan::whereDate('date_retour_effective', today())->whereIn('statut', ['retourne', 'perdu'])->count(),
+            'du_mois' => Loan::whereMonth('date_retour_effective', now()->month)->whereIn('statut', ['retourne', 'perdu'])->count(),
+            'de_l_annee' => Loan::whereYear('date_retour_effective', now()->year)->whereIn('statut', ['retourne', 'perdu'])->count(),
+        ];
+
+        return view('librarian.returns.index', compact('returns', 'stats'));
+    }
 }

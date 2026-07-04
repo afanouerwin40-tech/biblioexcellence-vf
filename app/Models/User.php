@@ -20,6 +20,7 @@ class User extends Authenticatable
         'role_type',
         'two_factor_enabled',
         'two_factor_secret',
+        'profile_photo',
     ];
 
     protected $hidden = [
@@ -37,14 +38,14 @@ class User extends Authenticatable
         ];
     }
 
-    // Relations
-    public function students()
+    // Relations (un utilisateur a un seul profil)
+    public function student()
     {
-        return $this->hasMany(Student::class);
+        return $this->hasOne(Student::class);
     }
 
-    public function teachers()
+    public function teacher()
     {
-        return $this->hasMany(Teacher::class);
+        return $this->hasOne(Teacher::class);
     }
 }

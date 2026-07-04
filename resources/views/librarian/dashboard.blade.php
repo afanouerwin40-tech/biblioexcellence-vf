@@ -2,17 +2,17 @@
 
 @section('title', 'Dashboard Bibliothécaire — BiblioExcellence')
 @section('page-title', 'Tableau de bord')
-@section('page-subtitle', 'Activité de la bibliothèque')
+@section('page-subtitle', 'Activité du ' . now()->format('d/m/Y'))
 
 @section('content')
 
+{{-- Stats (inchangées) --}}
 <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
-
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
         <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center mb-3">
             <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                    d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
             </svg>
         </div>
         <p class="text-2xl font-bold text-gray-800">{{ $stats['emprunts_jour'] }}</p>
@@ -23,7 +23,7 @@
         <div class="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center mb-3">
             <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
         </div>
         <p class="text-2xl font-bold text-gray-800">{{ $stats['retours_jour'] }}</p>
@@ -34,7 +34,7 @@
         <div class="w-10 h-10 bg-red-50 rounded-xl flex items-center justify-center mb-3">
             <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
         </div>
         <p class="text-2xl font-bold text-red-500">{{ $stats['en_retard'] }}</p>
@@ -45,7 +45,7 @@
         <div class="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center mb-3">
             <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2"/>
+                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2" />
             </svg>
         </div>
         <p class="text-2xl font-bold text-amber-500">
@@ -58,7 +58,7 @@
         <div class="w-10 h-10 bg-purple-50 rounded-xl flex items-center justify-center mb-3">
             <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                    d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0z" />
             </svg>
         </div>
         <p class="text-2xl font-bold text-gray-800">{{ $stats['nouveaux_inscrits'] }}</p>
@@ -69,68 +69,134 @@
         <div class="w-10 h-10 bg-teal-50 rounded-xl flex items-center justify-center mb-3">
             <svg class="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13"/>
+                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13" />
             </svg>
         </div>
         <p class="text-2xl font-bold text-gray-800">{{ $stats['livres_dispo'] }}</p>
         <p class="text-xs text-gray-500 mt-1">Livres disponibles</p>
     </div>
-
 </div>
 
-{{-- Emprunts récents --}}
-<div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-    <div class="px-6 py-4 border-b border-gray-100">
-        <h3 class="font-semibold text-gray-700">Emprunts récents</h3>
+{{-- Alerte retards --}}
+@if($stats['en_retard'] > 0)
+<div class="flex items-center gap-3 bg-red-50 border border-red-200 text-red-700
+                rounded-xl px-5 py-3 mb-6 text-sm">
+    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+    <span><strong>{{ $stats['en_retard'] }} emprunt(s)</strong> en retard nécessitent une attention immédiate.</span>
+</div>
+@endif
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+    {{-- Emprunts récents (inchangés) --}}
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-100">
+            <h3 class="font-semibold text-gray-700">Emprunts récents</h3>
+        </div>
+        @if($emprunts_recents->isEmpty())
+        <div class="text-center py-12 text-gray-400 text-sm">Aucun emprunt</div>
+        @else
+        <div class="divide-y divide-gray-50">
+            @foreach($emprunts_recents as $emprunt)
+            @php
+            $isLate = now()->gt($emprunt->date_retour_prevue)
+            && $emprunt->statut !== 'retourne';
+            @endphp
+            <div class="flex items-center justify-between px-6 py-3">
+                <div>
+                    <p class="text-sm font-medium text-gray-700">
+                        {{ $emprunt->user->name ?? '—' }}
+                    </p>
+                    <p class="text-xs text-gray-400">
+                        {{ $emprunt->bookCopy->book->titre ?? '—' }}
+                    </p>
+                </div>
+                <div class="text-right">
+                    <p class="text-xs text-gray-500">
+                        {{ $emprunt->date_emprunt->format('d/m/Y') }}
+                    </p>
+                    @php
+                    $colors = [
+                    'actif' => 'bg-blue-50 text-blue-600',
+                    'retourne' => 'bg-green-50 text-green-600',
+                    'en_retard' => 'bg-red-50 text-red-600',
+                    'renouvele' => 'bg-amber-50 text-amber-600',
+                    ];
+                    @endphp
+                    <span class="text-xs px-2 py-0.5 rounded-lg font-medium mt-1 inline-block
+                                {{ $colors[$emprunt->statut] ?? 'bg-gray-50 text-gray-600' }}">
+                        {{ ucfirst(str_replace('_', ' ', $emprunt->statut)) }}
+                    </span>
+                </div>
+            </div>
+            @endforeach
+        </div>
+        @endif
     </div>
 
-    @if($emprunts_recents->isEmpty())
-        <div class="text-center py-16 text-gray-400 text-sm">Aucun emprunt enregistré</div>
-    @else
-        <table class="w-full">
-            <thead class="bg-gray-50 text-xs text-gray-500 uppercase tracking-wider">
-                <tr>
-                    <th class="px-6 py-3 text-left">Utilisateur</th>
-                    <th class="px-6 py-3 text-left">Livre</th>
-                    <th class="px-6 py-3 text-left">Date emprunt</th>
-                    <th class="px-6 py-3 text-left">Retour prévu</th>
-                    <th class="px-6 py-3 text-left">Statut</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-50">
-                @foreach($emprunts_recents as $emprunt)
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-6 py-4 text-sm font-medium text-gray-700">
-                            {{ $emprunt->user->name ?? '—' }}
-                        </td>
-                        <td class="px-6 py-4 text-sm text-gray-600">
-                            {{ $emprunt->bookCopy->book->titre ?? '—' }}
-                        </td>
-                        <td class="px-6 py-4 text-sm text-gray-600">
-                            {{ $emprunt->date_emprunt->format('d/m/Y') }}
-                        </td>
-                        <td class="px-6 py-4 text-sm text-gray-600">
-                            {{ $emprunt->date_retour_prevue->format('d/m/Y') }}
-                        </td>
-                        <td class="px-6 py-4">
-                            @php
-                                $colors = [
-                                    'actif'    => 'bg-blue-50 text-blue-600',
-                                    'retourne' => 'bg-green-50 text-green-600',
-                                    'en_retard'=> 'bg-red-50 text-red-600',
-                                    'renouvele'=> 'bg-amber-50 text-amber-600',
-                                ];
-                            @endphp
-                            <span class="px-2.5 py-1 rounded-lg text-xs font-medium
-                                {{ $colors[$emprunt->statut] ?? 'bg-gray-50 text-gray-600' }}">
-                                {{ ucfirst(str_replace('_', ' ', $emprunt->statut)) }}
-                            </span>
-                        </td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-    @endif
+    {{-- Emprunts en retard — avec restant --}}
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+            <h3 class="font-semibold text-gray-700">Emprunts en retard</h3>
+            @if($stats['en_retard'] > 0)
+            <span class="text-xs bg-red-50 text-red-600 px-2.5 py-1 rounded-lg font-medium">
+                {{ $stats['en_retard'] }} en retard
+            </span>
+            @endif
+        </div>
+        @if($emprunts_retard->isEmpty())
+        <div class="text-center py-12">
+            <svg class="w-10 h-10 mx-auto mb-2 text-green-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p class="text-sm text-gray-400">Aucun retard</p>
+        </div>
+        @else
+        <div class="divide-y divide-gray-50">
+            @foreach($emprunts_retard as $emprunt)
+            @php
+            $joursBrut = $emprunt->jours_retard
+            ?? $emprunt->penalty->jours_retard
+            ?? now()->diffInDays($emprunt->date_retour_prevue);
+            $joursRetard = floor(abs($joursBrut));
+
+            $montantPenalite = $emprunt->penalty->montant ?? ($joursRetard * 100);
+            $montantPenalite = (int) round($montantPenalite);
+
+            $reste = $emprunt->penalty->reste ?? $montantPenalite;
+            @endphp
+            <div class="flex items-center justify-between px-6 py-3">
+                <div>
+                    <p class="text-sm font-medium text-gray-700">
+                        {{ $emprunt->user->name ?? '—' }}
+                    </p>
+                    <p class="text-xs text-gray-400">
+                        {{ $emprunt->bookCopy->book->titre ?? '—' }}
+                    </p>
+                </div>
+                <div class="text-right">
+                    <span class="text-xs bg-red-50 text-red-600 px-2 py-0.5 rounded-lg font-medium">
+                        {{ $joursRetard }}j de retard
+                    </span>
+                    <p class="text-xs text-red-400 mt-1">
+                        Dû : {{ number_format($montantPenalite, 0, ',', ' ') }} FCFA
+                    </p>
+                    @if($reste > 0 && $reste < $montantPenalite)
+                        <p class="text-xs text-amber-500 mt-0.5">
+                        Restant : {{ number_format($reste, 0, ',', ' ') }} FCFA
+                        </p>
+                        @endif
+                </div>
+            </div>
+            @endforeach
+        </div>
+        @endif
+    </div>
+
 </div>
 
 @endsection

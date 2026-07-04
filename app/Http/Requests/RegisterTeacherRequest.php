@@ -41,8 +41,6 @@ class RegisterTeacherRequest extends FormRequest
             'department_id.exists'           => 'Le département sélectionné est invalide.',
             'grade.required'                 => 'Le grade est obligatoire.',
             'grade.in'                       => 'Le grade sélectionné est invalide.',
-            'matricule_pro.required'         => 'Le matricule professionnel est obligatoire.',
-            'matricule_pro.unique'           => 'Ce matricule est déjà enregistré.',
             'photo.image'                    => 'La photo doit être une image.',
             'photo.mimes'                    => 'La photo doit être en jpg, jpeg ou png.',
             'photo.max'                      => 'La photo ne doit pas dépasser 2MB.',

@@ -13,12 +13,12 @@ class DashboardController extends Controller
     public function index()
     {
         $stats = [
-            'emprunts_jour'   => Loan::whereDate('created_at', today())->count(),
-            'retours_jour'    => Loan::whereDate('date_retour_effective', today())->count(),
-            'en_retard'       => Loan::where('statut', 'en_retard')->count(),
-            'penalites_dues'  => Penalty::where('statut', 'impayee')->sum('montant'),
-            'nouveaux_inscrits'=> User::whereDate('created_at', today())->count(),
-            'livres_dispo'    => Book::where('quantite_disponible', '>', 0)->count(),
+            'emprunts_jour'     => Loan::whereDate('created_at', today())->count(),
+            'retours_jour'      => Loan::whereDate('date_retour_effective', today())->count(),
+            'en_retard'         => Loan::where('statut', 'en_retard')->count(),
+            'penalites_dues'    => Penalty::where('statut', 'impayee')->sum('montant'),
+            'nouveaux_inscrits' => User::whereDate('created_at', today())->count(),
+            'livres_dispo'      => Book::where('quantite_disponible', '>', 0)->count(),
         ];
 
         $emprunts_recents = Loan::with(['user', 'bookCopy.book'])
@@ -26,6 +26,16 @@ class DashboardController extends Controller
             ->limit(8)
             ->get();
 
-        return view('librarian.dashboard', compact('stats', 'emprunts_recents'));
+        $emprunts_retard = Loan::with(['user', 'bookCopy.book'])
+            ->where('statut', 'en_retard')
+            ->orWhere(function($q) {
+                $q->where('statut', 'actif')
+                  ->where('date_retour_prevue', '<', now());
+            })
+            ->latest()
+            ->limit(10)
+            ->get();
+
+        return view('librarian.dashboard', compact('stats', 'emprunts_recents', 'emprunts_retard'));
     }
 }
