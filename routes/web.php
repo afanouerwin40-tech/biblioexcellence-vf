@@ -23,7 +23,7 @@ use App\Http\Controllers\Librarian\DashboardController as LibrarianDashboard;
 use App\Http\Controllers\Teacher\ReservationController as TeacherReservation;
 use App\Http\Controllers\Student\ReservationController as StudentReservation;
 use App\Http\Controllers\CatalogueController;      
-use App\Http\Controllers\NotificationController;  
+use App\Http\Controllers\NotificationController;   
 
 /*
 |--------------------------------------------------------------------------
@@ -48,6 +48,10 @@ Route::middleware('guest')->group(function () {
     Route::get('/register/teacher', [RegisterTeacherController::class, 'create'])->name('register.teacher');
     Route::post('/register/teacher', [RegisterTeacherController::class, 'store']);
 
+    // Page d'attente affichée juste après une inscription (étudiant ou enseignant),
+    // tant que l'admin n'a pas validé le compte.
+    Route::get('/inscription/en-attente', fn() => view('auth.pending-approval'))->name('pending.approval');
+
     Route::get('/forgot-password', fn() => view('auth.forgot-password'))->name('password.request');
     Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])->name('password.email');
 
@@ -61,18 +65,6 @@ Route::middleware('guest')->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
-
-/*
-|--------------------------------------------------------------------------
-| Page d'attente de validation (compte connecté mais pas encore "active")
-|--------------------------------------------------------------------------
-| Volontairement en dehors du middleware "check.status" : c'est justement
-| check.status qui doit rediriger ici les comptes "pending"/"rejected"/
-| "suspended" lorsqu'ils tentent d'accéder aux routes protégées.
-*/
-Route::middleware('auth')->get('/pending-approval', function () {
-    return view('auth.pending-approval', ['user' => auth()->user()]);
-})->name('pending.approval');
 
 /*
 |--------------------------------------------------------------------------

@@ -8,9 +8,12 @@ use App\Models\Author;
 use App\Models\Book;
 use App\Models\BookCopy;
 use App\Models\Category;
+use App\Models\User;
+use App\Notifications\BookCreatedNotification;
 use App\Services\ImageService;
 use App\Services\QrCodeService;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 
 class BookController extends Controller
 {
@@ -44,7 +47,9 @@ class BookController extends Controller
 
     public function store(StoreBookRequest $request)
     {
-        DB::transaction(function () use ($request) {
+        $book = null;
+
+        DB::transaction(function () use ($request, &$book) {
 
             // 1. Traitement couverture
             $couverturePath = null;
@@ -82,6 +87,14 @@ class BookController extends Controller
                 ]);
             }
         });
+
+        // Notifie tous les étudiants et enseignants approuvés du nouvel ajout
+        // (par lots de 100 pour ne pas surcharger la mémoire/la file de mail)
+        User::where('status', 'approved')
+            ->whereIn('role_type', ['student', 'teacher'])
+            ->chunk(100, function ($users) use ($book) {
+                Notification::send($users, new BookCreatedNotification($book));
+            });
 
         return redirect()->route('admin.books.index')
             ->with('success', 'Livre ajouté avec succès.');

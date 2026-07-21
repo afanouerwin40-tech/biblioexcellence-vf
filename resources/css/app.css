@@ -6,3 +6,8 @@
 .group {
     touch-action: pan-y; /* empêche le scroll vertical pendant le swipe */
 }
+
+/* Évite le flash d'un élément Alpine.js avant l'initialisation */
+[x-cloak] {
+    display: none !important;
+}

@@ -52,8 +52,10 @@ class RegisterStudentController extends Controller
      */
     public function store(RegisterStudentRequest $request)
     {
+        $matricule = null;
+
         // Transaction — si une étape échoue, tout est annulé
-        DB::transaction(function () use ($request) {
+        DB::transaction(function () use ($request, &$matricule) {
 
             // 1. Génération automatique du matricule
             $matricule = $this->generateMatricule();
@@ -100,11 +102,13 @@ class RegisterStudentController extends Controller
             ]);
         });
 
-        // Redirection avec message de succès
-        return redirect('/login')->with(
-            'success',
-            'Votre inscription a été soumise avec succès. Votre compte est en attente de validation par un administrateur.'
-        );
+        // Redirection vers la page d'attente de validation
+        return redirect()->route('pending.approval')->with([
+            'registered_name'      => trim($request->prenom . ' ' . $request->nom),
+            'registered_email'     => $request->email,
+            'registered_matricule' => $matricule,
+            'registered_role'      => 'Étudiant',
+        ]);
     }
 
     /**

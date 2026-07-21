@@ -46,7 +46,9 @@ class RegisterTeacherController extends Controller
 
     public function store(RegisterTeacherRequest $request)
     {
-        DB::transaction(function () use ($request) {
+        $matricule = null;
+
+        DB::transaction(function () use ($request, &$matricule) {
 
             // 1. Génération automatique du matricule
             $matricule = $this->generateMatricule();
@@ -90,10 +92,12 @@ class RegisterTeacherController extends Controller
             ]);
         });
 
-        return redirect('/login')->with(
-            'success',
-            'Votre inscription a été soumise. Votre compte est en attente de validation.'
-        );
+        return redirect()->route('pending.approval')->with([
+            'registered_name'      => trim($request->prenom . ' ' . $request->nom),
+            'registered_email'     => $request->email,
+            'registered_matricule' => $matricule,
+            'registered_role'      => 'Enseignant',
+        ]);
     }
 
     private function processPhoto($file): string
