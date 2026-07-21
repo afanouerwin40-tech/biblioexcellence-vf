@@ -20,6 +20,8 @@ class DashboardController extends Controller
             'emprunts_total'  => Loan::where('user_id', $user->id)->count(),
             'reservations'    => Reservation::where('user_id', $user->id)
                 ->where('statut', 'en_attente')->count(),
+            'penalites'       => Penalty::where('user_id', $user->id)
+                ->where('statut', 'impayee')->sum('montant'),
         ];
 
         $emprunts = Loan::with('bookCopy.book')
@@ -56,6 +58,8 @@ class DashboardController extends Controller
             ->orderBy('date_emprunt', 'desc')
             ->paginate(15);
 
-        return view('teacher.loans', compact('loans')); // ou teacher.loans
+        return view('teacher.loans', compact('loans'));
     }
+
+
 }

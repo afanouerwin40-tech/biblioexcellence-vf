@@ -33,7 +33,9 @@ class RegisterStudentRequest extends FormRequest
             'adresse'          => ['nullable', 'string', 'max:255'],
 
             // Informations académiques
-            'matricule'        => ['required', 'string', 'max:50', 'unique:students,matricule'],
+            // NB : le matricule est généré automatiquement par le contrôleur
+            // (RegisterStudentController::generateMatricule()) — il n'est pas
+            // envoyé par le formulaire et ne doit donc pas être validé ici.
             'department_id'    => ['required', 'exists:departments,id'],
             'niveau'           => ['required', 'in:L1,L2,L3,M1,M2,D1,D2,D3'],
             'annee_academique' => ['required', 'string', 'max:20'],

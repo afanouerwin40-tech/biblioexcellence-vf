@@ -18,10 +18,10 @@ class DashboardController extends Controller
             'emprunts_actifs' => Loan::where('user_id', $user->id)
                 ->whereIn('statut', ['actif', 'en_retard', 'renouvele'])->count(),
             'emprunts_total'  => Loan::where('user_id', $user->id)->count(),
-            'penalites'       => Penalty::where('user_id', $user->id)
-                ->where('statut', 'impayee')->sum('montant'),
             'reservations'    => Reservation::where('user_id', $user->id)
                 ->where('statut', 'en_attente')->count(),
+            'penalites'       => Penalty::where('user_id', $user->id)
+                ->where('statut', 'impayee')->sum('montant'), 
         ];
 
         // Emprunts actifs

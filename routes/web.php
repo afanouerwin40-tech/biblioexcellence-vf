@@ -22,8 +22,8 @@ use App\Http\Controllers\Teacher\DashboardController as TeacherDashboard;
 use App\Http\Controllers\Librarian\DashboardController as LibrarianDashboard;
 use App\Http\Controllers\Teacher\ReservationController as TeacherReservation;
 use App\Http\Controllers\Student\ReservationController as StudentReservation;
-use App\Http\Controllers\CatalogueController;      // <-- Ajout
-use App\Http\Controllers\NotificationController;   // <-- Ajout
+use App\Http\Controllers\CatalogueController;      
+use App\Http\Controllers\NotificationController;  
 
 /*
 |--------------------------------------------------------------------------
@@ -61,6 +61,18 @@ Route::middleware('guest')->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
+
+/*
+|--------------------------------------------------------------------------
+| Page d'attente de validation (compte connecté mais pas encore "active")
+|--------------------------------------------------------------------------
+| Volontairement en dehors du middleware "check.status" : c'est justement
+| check.status qui doit rediriger ici les comptes "pending"/"rejected"/
+| "suspended" lorsqu'ils tentent d'accéder aux routes protégées.
+*/
+Route::middleware('auth')->get('/pending-approval', function () {
+    return view('auth.pending-approval', ['user' => auth()->user()]);
+})->name('pending.approval');
 
 /*
 |--------------------------------------------------------------------------

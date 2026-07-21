@@ -5,8 +5,13 @@ namespace App\Services;
 use App\Models\BookCopy;
 use App\Models\Loan;
 use App\Models\Penalty;
+use App\Models\Reservation;
 use App\Models\Setting;
 use App\Models\User;
+use App\Notifications\LoanCreatedNotification;
+use App\Notifications\LoanReturnedNotification;
+use App\Notifications\PenaltyCreatedNotification;
+use App\Notifications\ReservationAvailableNotification;
 use Illuminate\Support\Facades\DB;
 
 class LoanService
@@ -73,7 +78,7 @@ class LoanService
                 'user_id'           => $user->id,
                 'book_copy_id'      => $copy->id,
                 'date_emprunt'      => now(),
-                'date_retour_prevue'=> now()->addDays($duree),
+                'date_retour_prevue' => now()->addDays($duree),
                 'statut'            => 'actif',
                 'traite_par'        => $librarian->id,
             ]);
@@ -83,6 +88,9 @@ class LoanService
 
             // Décrémenter la quantité disponible du livre
             $copy->book->decrement('quantite_disponible');
+
+            // Notifier l'emprunteur (email + notification en application)
+            $user->notify(new LoanCreatedNotification($loan));
 
             return $loan;
         });
@@ -128,13 +136,52 @@ class LoanService
                     'montant'      => $montant,
                     'statut'       => 'impayee',
                 ]);
+
+                $loan->user->notify(new PenaltyCreatedNotification($penalite));
             }
+
+            // Confirmer le retour à l'emprunteur
+            $loan->user->notify(new LoanReturnedNotification($loan));
+
+            // Le livre redevient disponible : prévenir le premier de la file d'attente
+            $this->fulfillNextReservation($loan->bookCopy->book_id);
 
             return [
                 'retard'   => $retard,
                 'penalite' => $penalite,
             ];
         });
+    }
+
+    /**
+     * Fait passer la réservation la plus ancienne d'un livre au statut
+     * "disponible" et prévient l'utilisateur concerné. Il dispose alors
+     * de 48h (configurable) pour venir emprunter le livre.
+     *
+     * Public : également appelée par la commande reservations:expire
+     * lorsqu'une réservation expire sans avoir été retirée, pour faire
+     * avancer la file d'attente vers le suivant.
+     */
+    public function fulfillNextReservation(int $bookId): void
+    {
+        $reservation = Reservation::where('book_id', $bookId)
+            ->where('statut', 'en_attente')
+            ->orderBy('position_file')
+            ->first();
+
+        if (! $reservation) {
+            return;
+        }
+
+        $delaiHeures = (int) Setting::get('delai_reservation_heures', 48);
+
+        $reservation->update([
+            'statut'      => 'disponible',
+            'notified_at' => now(),
+            'expires_at'  => now()->addHours($delaiHeures),
+        ]);
+
+        $reservation->user->notify(new ReservationAvailableNotification($reservation));
     }
 
     /**

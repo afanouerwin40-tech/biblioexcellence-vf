@@ -21,7 +21,10 @@ class RegisterTeacherRequest extends FormRequest
             'adresse'              => ['nullable', 'string', 'max:255'],
             'department_id'        => ['required', 'exists:departments,id'],
             'grade'                => ['required', 'in:Assistant,Maître Assistant,Maître de Conférences,Professeur'],
-            'matricule_pro'        => ['required', 'string', 'max:50', 'unique:teachers,matricule_pro'],
+            // NB : le matricule professionnel est généré automatiquement par
+            // le contrôleur (RegisterTeacherController::generateMatricule())
+            // — il n'est pas envoyé par le formulaire et ne doit donc pas
+            // être validé ici.
             'specialite'           => ['nullable', 'string', 'max:150'],
             'photo'                => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
             'carte_professionnelle' => ['required', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:2048'],
