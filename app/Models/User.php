@@ -7,7 +7,6 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 
-
 class User extends Authenticatable
 {
     use HasFactory, Notifiable, HasRoles;
@@ -18,6 +17,7 @@ class User extends Authenticatable
         'identifier',
         'password',
         'status',
+        'rejection_reason',
         'role_type',
         'two_factor_enabled',
         'two_factor_secret',

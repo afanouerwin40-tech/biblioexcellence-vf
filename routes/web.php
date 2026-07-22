@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterStudentController;
 use App\Http\Controllers\Auth\RegisterTeacherController;
+use App\Http\Controllers\Auth\PendingApprovalController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\ProfileController;
@@ -22,8 +23,8 @@ use App\Http\Controllers\Teacher\DashboardController as TeacherDashboard;
 use App\Http\Controllers\Librarian\DashboardController as LibrarianDashboard;
 use App\Http\Controllers\Teacher\ReservationController as TeacherReservation;
 use App\Http\Controllers\Student\ReservationController as StudentReservation;
-use App\Http\Controllers\CatalogueController;      
-use App\Http\Controllers\NotificationController;   
+use App\Http\Controllers\CatalogueController;      // <-- Ajout
+use App\Http\Controllers\NotificationController;   // <-- Ajout
 
 /*
 |--------------------------------------------------------------------------
@@ -50,7 +51,7 @@ Route::middleware('guest')->group(function () {
 
     // Page d'attente affichée juste après une inscription (étudiant ou enseignant),
     // tant que l'admin n'a pas validé le compte.
-    Route::get('/inscription/en-attente', fn() => view('auth.pending-approval'))->name('pending.approval');
+    Route::get('/inscription/en-attente', [PendingApprovalController::class, 'show'])->name('pending.approval');
 
     Route::get('/forgot-password', fn() => view('auth.forgot-password'))->name('password.request');
     Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])->name('password.email');

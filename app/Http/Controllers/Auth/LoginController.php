@@ -47,7 +47,13 @@ class LoginController extends Controller
             $request->password
         );
 
-        // Échec
+        // Compte pas encore approuvé (pending / rejected / suspended) :
+        // on redirige vers la page d'attente, qui affichera le statut réel.
+        if (! empty($result['redirect_pending'])) {
+            return redirect()->route('pending.approval');
+        }
+
+        // Échec (identifiants incorrects)
         if (! $result['success']) {
             return back()
                 ->withInput($request->only('identifier'))

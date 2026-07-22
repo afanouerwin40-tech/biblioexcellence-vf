@@ -4,8 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inscription en attente — BiblioExcellence</title>
+    <title>Statut de mon compte — BiblioExcellence</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @if (($account['status'] ?? null) === 'approved')
+        <meta http-equiv="refresh" content="5;url={{ $account['login_url'] }}">
+    @endif
 </head>
 
 <body class="min-h-screen flex">
@@ -55,84 +58,165 @@
                 <h1 class="text-xl font-bold text-gray-800">BiblioExcellence</h1>
             </div>
 
-            {{-- Icône statut --}}
-            <div class="text-center mb-6">
-                <div class="inline-flex items-center justify-center w-20 h-20 bg-amber-100
-                            rounded-3xl mb-6">
-                    <svg class="w-10 h-10 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                </div>
-                <h2 class="text-2xl font-bold text-gray-800">Inscription en attente de validation</h2>
-                <p class="text-gray-500 mt-3 leading-relaxed">
-                    @if (session('registered_name'))
-                    Merci, {{ session('registered_name') }} ! Votre dossier a bien été reçu.
-                    @else
-                    Votre dossier a bien été reçu.
-                    @endif
-                    Un administrateur doit vérifier vos informations avant que vous puissiez vous connecter.
-                </p>
-            </div>
-
-            {{-- Récapitulatif de l'inscription --}}
-            @if (session('registered_email'))
-            <div class="bg-white border border-gray-100 rounded-2xl shadow-sm p-5 mb-6 text-sm divide-y divide-gray-100">
-                <div class="flex justify-between py-2 first:pt-0">
-                    <span class="text-gray-500">Profil</span>
-                    <span class="text-gray-800 font-medium">{{ session('registered_role') }}</span>
-                </div>
-                <div class="flex justify-between py-2">
-                    <span class="text-gray-500">Email</span>
-                    <span class="text-gray-800 font-medium">{{ session('registered_email') }}</span>
-                </div>
-                @if (session('registered_matricule'))
-                <div class="flex justify-between py-2 last:pb-0">
-                    <span class="text-gray-500">Matricule</span>
-                    <span class="text-gray-800 font-medium">{{ session('registered_matricule') }}</span>
-                </div>
-                @endif
-            </div>
-            @endif
-
-            {{-- Étapes --}}
-            <div class="bg-white border border-gray-100 rounded-2xl shadow-sm p-5 mb-6">
-                <div class="flex items-start gap-3 pb-4">
-                    <div class="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+            @if (! $account)
+                {{-- Aucune info disponible : ni inscription récente, ni tentative de connexion --}}
+                <div class="text-center mb-6">
+                    <div class="inline-flex items-center justify-center w-20 h-20 bg-gray-100 rounded-3xl mb-6">
+                        <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                     </div>
-                    <div>
-                        <p class="text-sm font-medium text-gray-800">Dossier soumis</p>
-                        <p class="text-xs text-gray-400">Votre formulaire a été enregistré</p>
-                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800">Statut de compte</h2>
+                    <p class="text-gray-500 mt-3 leading-relaxed">
+                        Aucune information de compte à afficher pour le moment.
+                        Connectez-vous pour vérifier l'état de votre dossier.
+                    </p>
                 </div>
-                <div class="flex items-start gap-3 pb-4">
-                    <div class="w-6 h-6 rounded-full bg-amber-100 border-2 border-amber-500 flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <div class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></div>
-                    </div>
-                    <div>
-                        <p class="text-sm font-medium text-gray-800">Vérification par un administrateur</p>
-                        <p class="text-xs text-gray-400">En cours — cela peut prendre quelques heures</p>
-                    </div>
-                </div>
-                <div class="flex items-start gap-3">
-                    <div class="w-6 h-6 rounded-full bg-gray-100 border-2 border-gray-300 flex-shrink-0 mt-0.5"></div>
-                    <div>
-                        <p class="text-sm font-medium text-gray-400">Compte validé</p>
-                        <p class="text-xs text-gray-400">Vous pourrez alors vous connecter</p>
-                    </div>
-                </div>
-            </div>
+                <a href="{{ route('login') }}"
+                    class="w-full block text-center bg-blue-600 hover:bg-blue-700 active:bg-blue-800
+                           text-white font-semibold py-3 rounded-xl transition duration-200
+                           text-sm shadow-lg shadow-blue-200">
+                    Aller à la connexion
+                </a>
 
-            {{-- Actions --}}
-            <a href="{{ route('login') }}"
-                class="w-full block text-center bg-blue-600 hover:bg-blue-700 active:bg-blue-800
-                       text-white font-semibold py-3 rounded-xl transition duration-200
-                       text-sm shadow-lg shadow-blue-200">
-                Retour à la connexion
-            </a>
+            @elseif ($account['status'] === 'approved')
+                {{-- Compte approuvé : bonne nouvelle, redirection vers login --}}
+                <div class="text-center mb-6">
+                    <div class="inline-flex items-center justify-center w-20 h-20 bg-green-100 rounded-3xl mb-6">
+                        <svg class="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800">Bonne nouvelle, {{ $account['name'] }} !</h2>
+                    <p class="text-gray-500 mt-3 leading-relaxed">
+                        Votre compte a été <span class="text-green-600 font-semibold">approuvé</span> par
+                        un administrateur. Vous pouvez maintenant vous connecter.
+                    </p>
+                </div>
+
+                <a href="{{ $account['login_url'] }}"
+                    class="w-full block text-center bg-green-600 hover:bg-green-700 active:bg-green-800
+                           text-white font-semibold py-3 rounded-xl transition duration-200
+                           text-sm shadow-lg shadow-green-200">
+                    Se connecter maintenant
+                </a>
+                <p class="text-center text-xs text-gray-400 mt-4">
+                    Redirection automatique dans quelques secondes...
+                </p>
+
+            @elseif (in_array($account['status'], ['rejected', 'suspended']))
+                {{-- Compte rejeté ou suspendu --}}
+                <div class="text-center mb-6">
+                    <div class="inline-flex items-center justify-center w-20 h-20 bg-red-100 rounded-3xl mb-6">
+                        <svg class="w-10 h-10 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800">
+                        {{ $account['status'] === 'rejected' ? 'Inscription refusée' : 'Compte suspendu' }}
+                    </h2>
+                    <p class="text-gray-500 mt-3 leading-relaxed">
+                        Bonjour {{ $account['name'] }}, votre compte a été
+                        {{ $account['status'] === 'rejected' ? 'refusé' : 'suspendu' }} par un administrateur.
+                    </p>
+                </div>
+
+                @if ($account['rejection_reason'])
+                <div class="bg-red-50 border border-red-200 rounded-2xl p-5 mb-6 text-sm">
+                    <p class="text-red-700 font-medium mb-1">Motif indiqué :</p>
+                    <p class="text-red-600">{{ $account['rejection_reason'] }}</p>
+                </div>
+                @else
+                <div class="bg-gray-50 border border-gray-200 rounded-2xl p-5 mb-6 text-sm text-gray-500">
+                    Aucun motif détaillé n'a été renseigné. Contactez l'administration pour plus d'informations.
+                </div>
+                @endif
+
+                <a href="mailto:bibliotheque@excellence.tg"
+                    class="w-full block text-center bg-gray-800 hover:bg-gray-900 text-white font-semibold
+                           py-3 rounded-xl transition duration-200 text-sm">
+                    Contacter l'administration
+                </a>
+
+            @else
+                {{-- En attente de validation (statut par défaut) --}}
+                <div class="text-center mb-6">
+                    <div class="inline-flex items-center justify-center w-20 h-20 bg-amber-100
+                                rounded-3xl mb-6">
+                        <svg class="w-10 h-10 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800">Inscription en attente de validation</h2>
+                    <p class="text-gray-500 mt-3 leading-relaxed">
+                        Merci, {{ $account['name'] }} ! Un administrateur doit vérifier vos informations
+                        avant que vous puissiez vous connecter.
+                    </p>
+                </div>
+
+                <div class="bg-white border border-gray-100 rounded-2xl shadow-sm p-5 mb-6 text-sm divide-y divide-gray-100">
+                    <div class="flex justify-between py-2 first:pt-0">
+                        <span class="text-gray-500">Profil</span>
+                        <span class="text-gray-800 font-medium">{{ $account['role'] }}</span>
+                    </div>
+                    <div class="flex justify-between py-2">
+                        <span class="text-gray-500">Email</span>
+                        <span class="text-gray-800 font-medium">{{ $account['email'] }}</span>
+                    </div>
+                    @if ($account['matricule'])
+                    <div class="flex justify-between py-2 last:pb-0">
+                        <span class="text-gray-500">Matricule</span>
+                        <span class="text-gray-800 font-medium">{{ $account['matricule'] }}</span>
+                    </div>
+                    @endif
+                </div>
+
+                <div class="bg-white border border-gray-100 rounded-2xl shadow-sm p-5 mb-6">
+                    <div class="flex items-start gap-3 pb-4">
+                        <div class="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-800">Dossier soumis</p>
+                            <p class="text-xs text-gray-400">Votre formulaire a été enregistré</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3 pb-4">
+                        <div class="w-6 h-6 rounded-full bg-amber-100 border-2 border-amber-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <div class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></div>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-800">Vérification par un administrateur</p>
+                            <p class="text-xs text-gray-400">En cours — cela peut prendre quelques heures</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <div class="w-6 h-6 rounded-full bg-gray-100 border-2 border-gray-300 flex-shrink-0 mt-0.5"></div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-400">Compte validé</p>
+                            <p class="text-xs text-gray-400">Vous pourrez alors vous connecter</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-3">
+                    <a href="{{ route('pending.approval') }}"
+                        class="w-full text-center bg-blue-600 hover:bg-blue-700 active:bg-blue-800
+                               text-white font-semibold py-3 rounded-xl transition duration-200
+                               text-sm shadow-lg shadow-blue-200">
+                        Vérifier à nouveau mon statut
+                    </a>
+                    <a href="{{ route('login') }}" class="w-full text-center text-sm text-gray-500 hover:text-gray-700 py-2">
+                        ← Retour à la connexion
+                    </a>
+                </div>
+            @endif
 
             <p class="text-center text-xs text-gray-400 mt-8">
                 © {{ date('Y') }} BiblioExcellence — Tous droits réservés

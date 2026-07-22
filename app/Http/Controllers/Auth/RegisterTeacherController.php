@@ -47,8 +47,9 @@ class RegisterTeacherController extends Controller
     public function store(RegisterTeacherRequest $request)
     {
         $matricule = null;
+        $user = null;
 
-        DB::transaction(function () use ($request, &$matricule) {
+        DB::transaction(function () use ($request, &$matricule, &$user) {
 
             // 1. Génération automatique du matricule
             $matricule = $this->generateMatricule();
@@ -91,6 +92,8 @@ class RegisterTeacherController extends Controller
                 'carte_professionnelle' => $cartePath,
             ]);
         });
+
+        session()->put('pending_check_user_id', $user->id);
 
         return redirect()->route('pending.approval')->with([
             'registered_name'      => trim($request->prenom . ' ' . $request->nom),

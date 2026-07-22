@@ -40,7 +40,7 @@ class UserValidationController extends Controller
     public function approve(User $user)
     {
         $oldStatus = $user->status;
-        $user->update(['status' => 'approved']);
+        $user->update(['status' => 'approved', 'rejection_reason' => null]);
         $this->log('account_approved', $user, ['status' => $oldStatus], ['status' => 'approved']);
         if ($user->email) {
             $user->notify(new AccountApprovedNotification());
@@ -52,7 +52,10 @@ class UserValidationController extends Controller
     {
         $request->validate(['raison' => ['nullable', 'string', 'max:500']]);
         $oldStatus = $user->status;
-        $user->update(['status' => 'rejected']);
+        $user->update([
+            'status'           => 'rejected',
+            'rejection_reason' => $request->raison ?: null,
+        ]);
         $this->log('account_rejected', $user, ['status' => $oldStatus], ['status' => 'rejected']);
         if ($user->email) {
             $user->notify(new AccountRejectedNotification($request->raison ?? ''));

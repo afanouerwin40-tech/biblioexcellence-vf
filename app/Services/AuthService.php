@@ -36,12 +36,16 @@ class AuthService
             ];
         }
 
-        // Vérification du statut du compte
-        $statusCheck = $this->checkStatus($user);
-        if (! $statusCheck['allowed']) {
+        // Compte pas encore approuvé (pending / rejected / suspended) :
+        // le mot de passe est correct, donc on sait qui c'est, mais on ne
+        // le connecte pas — on le redirige vers la page d'attente qui
+        // affichera son statut réel (et le motif si rejeté).
+        if ($user->status !== 'approved') {
+            session()->put('pending_check_user_id', $user->id);
+
             return [
-                'success' => false,
-                'message' => $statusCheck['message'],
+                'success'          => false,
+                'redirect_pending' => true,
             ];
         }
 
@@ -52,35 +56,6 @@ class AuthService
             'success'  => true,
             'redirect' => $this->getRedirectUrl($user),
         ];
-    }
-
-    /**
-     * Vérifie si le compte est autorisé à se connecter.
-     */
-    private function checkStatus(User $user): array
-    {
-        return match ($user->status) {
-            'approved' => [
-                'allowed' => true,
-                'message' => '',
-            ],
-            'pending' => [
-                'allowed' => false,
-                'message' => 'Votre compte est en attente de validation par un administrateur.',
-            ],
-            'rejected' => [
-                'allowed' => false,
-                'message' => 'Votre compte a été refusé. Contactez l\'administration.',
-            ],
-            'suspended' => [
-                'allowed' => false,
-                'message' => 'Votre compte a été suspendu. Contactez l\'administration.',
-            ],
-            default => [
-                'allowed' => false,
-                'message' => 'Statut de compte inconnu. Contactez l\'administration.',
-            ],
-        };
     }
 
     /**

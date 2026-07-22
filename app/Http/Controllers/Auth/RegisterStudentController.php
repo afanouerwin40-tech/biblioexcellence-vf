@@ -53,9 +53,10 @@ class RegisterStudentController extends Controller
     public function store(RegisterStudentRequest $request)
     {
         $matricule = null;
+        $user = null;
 
         // Transaction — si une étape échoue, tout est annulé
-        DB::transaction(function () use ($request, &$matricule) {
+        DB::transaction(function () use ($request, &$matricule, &$user) {
 
             // 1. Génération automatique du matricule
             $matricule = $this->generateMatricule();
@@ -101,6 +102,10 @@ class RegisterStudentController extends Controller
                 'carte_etudiante'  => $cartePath,
             ]);
         });
+
+        // Permet de relire le statut réel (pending/approved/rejected) à
+        // chaque futur affichage de la page d'attente, sans être connecté.
+        session()->put('pending_check_user_id', $user->id);
 
         // Redirection vers la page d'attente de validation
         return redirect()->route('pending.approval')->with([
